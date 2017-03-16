@@ -1,0 +1,63 @@
+.poc-fieldset-block {
+	border: 1px solid #dfdfdf;
+	margin-bottom: 10px;
+	overflow: hidden;
+	padding: 10px;
+	position: relative;
+}
+.poc-input-full-field {
+	width: 99%;
+}
+.poc-fieldset-block table {
+	width: 100%;
+}
+.poc-fieldset-block table td {
+	width: 65%;
+}
+.poc-fieldset-block table td.label-td {
+	width: 30%;
+}
+
+/* Image Form Element */
+.meta-image-selector {
+	min-height: 50px;
+	position: relative;
+}
+.meta-image-selector .meta-image-preview {
+	height:auto;
+	margin-left: 30px;
+	max-height:100%;
+	max-width:100%;
+	min-width:100px;
+	width:auto;
+}
+.meta-image-selector .meta-image-add-button,
+.meta-image-selector .meta-image-delete-button {
+	height: 20px;
+	overflow: hidden;
+	position: absolute;
+	left: 0;
+	text-indent: -500px;
+	top: 0;
+	width: 20px;
+	z-index: 10;
+}
+.meta-image-selector .meta-image-delete-button {
+	top: 25px;
+}
+.meta-image-selector .meta-image-add-button:before,
+.meta-image-selector .meta-image-delete-button:before {
+	background-color: white;
+	color: black;
+	content: "\f03e";
+	font: normal normal 15px/20px FontAwesome;
+	position: absolute;
+	right: 0;
+	text-align: center;
+	text-indent: 0;
+	width: 100%;
+}
+.meta-image-selector .meta-image-delete-button:before {
+	content: "\f014";
+	color: red;
+}
