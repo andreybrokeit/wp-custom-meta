@@ -1,7 +1,8 @@
 <?php
 /**
  * Plugin Name:  POC Meta
- * Description:  Add custom meta 
+ * Plugin URI:   https://github.com/andreybrokeit/wp-custom-meta
+ * Description:  Add custom meta
  * Version:      1.0
  * Author:       Andrey C
  * Author URI:   https://github.com/andreybrokeit/
