@@ -38,7 +38,16 @@ class Custom_Event_Meta {
 			// Load Scripts and Styles
 			add_action('admin_enqueue_scripts', array($this, 'admin_enqueue_scripts'));
 		}
+		add_action('rest_api_init', function() {
+			register_rest_field('page',
+				self::META_KEY,
+				array(
+					'get_callback' => array($this, 'slug_get_post_meta_cb')
+				)
+			);
+		});
 	}
+
 
 	/**
 	 * Method to add custome meta box to WP post
@@ -62,7 +71,7 @@ class Custom_Event_Meta {
 	 * Draws meta box on the page
 	 * @param object $post - object type WP_Post
 	 */
-	public function metabox($post) {
+	public function metabox($post) { 
 		$meta = self::get_meta($post->ID); ?>
 
 		<fieldset class="poc-fieldset-block">
@@ -166,9 +175,17 @@ class Custom_Event_Meta {
 
 		if (empty($post_id) || intval($post_id) < 1) return array();
 
-		$meta = get_post_meta($post_id, self::META_KEY, true);
+		return get_post_meta($post_id, self::META_KEY, true);
+	}
 
-		return $meta;
+	/**
+	 * Fetch meta data for the post API response
+	 * @param object $object - WP_Object post object
+	 * @param string $field_name - name of the meta to fetch
+	 * @return object $request - request object, who cares
+	 */
+	public function get_meta_api($object, $field_name, $request) {
+		return get_post_meta($object['id'], $field_name);
 	}
 
 	/**
