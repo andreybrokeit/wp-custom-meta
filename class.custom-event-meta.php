@@ -42,7 +42,7 @@ class Custom_Event_Meta {
 			register_rest_field('page',
 				self::META_KEY,
 				array(
-					'get_callback' => array($this, 'slug_get_post_meta_cb')
+					'get_callback' => array($this, 'get_meta_api')
 				)
 			);
 		});
