@@ -18,6 +18,115 @@
             `      '-;         (-'
 */
 jQuery(function($) {
+	dynamic_content_manager = {};
+
+	(function() {
+		var count = ($('.fieldset-block:not(.fieldset-block-dummy)').length)*1;
+		var index = $('.fieldset-block-dummy').first().data('clone-siblings')*1;
+
+		if (index > count) {
+			index += 1;
+		} else {
+			index = count + 1;
+		}
+		$('.fieldset-block-dummy').data('clone-siblings', index);
+	})();
+
+	dynamic_content_manager.clone_dummy_form_element = function($dummy_obj) {
+		if (!$dummy_obj) return;
+
+		var $container = $dummy_obj.parent();
+		var new_index = $dummy_obj.data('clone-siblings')*1 + 1;
+		$dummy_obj.data('clone-siblings', new_index);
+
+		var $new_obj = $dummy_obj.clone();
+		$new_obj
+			.removeClass('cbs-fieldset-block-dummy')
+			.addClass('cbs-fieldset-just-added')
+			.addClass('modular-content-block')
+			.html(function(i, oldHTML) { // replace indexes
+				return oldHTML.replace(/_DUMMY_INDEX_/g, new_index);
+			})
+			.html(function(i, oldHTML) { // replace names
+				return oldHTML.replace(/_DUMMY_NAME_/g, new_index);
+			})
+			.insertBefore($container.children('.cbs-fieldset-block-dummy'));
+
+		// setup collapsible item
+		if ($new_obj.children('fieldset').children('legend').length > 0) {
+			cbs_admin.setup_collapsible_block($new_obj.children('fieldset').children('legend'));
+		}
+
+		// initiate removable button
+		if ($new_obj.find('.cbs-removing-button').length > 0) {
+			cbs_admin.update_remove_buttons($new_obj);
+		}
+
+		// setup showhide
+		var $new_showhide_selects = $new_obj.find(".cbs-theme-form-select select.showhide-row");
+		if ($new_showhide_selects.length > 0) {
+			$new_showhide_selects.each(function(){
+				cbs_admin.setup_select_showhide($(this));
+				cbs_admin.update_select_showhide($(this));
+			});
+		}
+
+		// Setup Checkbox
+		var $new_showhide_checkbox = $new_obj.find(".cbs-theme-form-checkbox input[type='checkbox'].showhide-row");
+		if ($new_showhide_checkbox.length > 0) {
+			$new_showhide_checkbox.each(function(){
+				cbs_admin.setup_checkbox_showhide($(this));
+				cbs_admin.update_checkbox_showhide($(this));
+			});
+		}
+
+		// Setup Select Multiple items with Select2
+		var $new_select2_box = $new_obj.find("select[multiple='multiple'].cbs-select2");
+		if ($new_select2_box.length > 0) {
+			$new_select2_box.each(function(){
+				$(this)
+					.addClass('cbs-category-dropdown')
+					.select2({
+						placeholder: 'Select Category',
+						allowClear: true
+					});
+			});
+		}
+
+		// Setup MediaImage blocks
+		var $new_media_image_box = $new_obj.find(".meta-image-selector");
+		if ($new_media_image_box.length > 0) {
+			$new_media_image_box.each(function(){
+				cbs_admin.setup_meta_image($(this));
+			});
+		}
+
+	}
+	dynamic_content_manager.update_remove_buttons = function($block) {
+		if ($block) {
+			var $remove_buttons = $block.find('.cbs-removing-button');
+		} else {
+			var $remove_buttons = $('.modular-content-block .cbs-removing-button');
+		}
+
+		if ($remove_buttons.length > 0) {
+			$remove_buttons.each(function(){
+				$(this)
+					.off('click')
+					.on('click', function(e){
+						e.preventDefault();
+						$(this).closest('.modular-content-block').remove();
+						$(this).off('click');
+						dynamic_content_manager.update_sortable_index();
+					})
+					.show();
+			});
+		}
+	}
+
+
+
+
 	var image_selector = {};
 
 	image_selector.setup_meta_image = function($obj) {

@@ -16,6 +16,11 @@ class Custom_Event_Meta {
 	static $instance = false;
 
 	/**
+	 * Module types
+	 */
+	static $supported_module_type = array();
+
+	/**
 	 * Entry point into the singleton class
 	 * @static
 	 * @return object $instance of the obejct Custom_Event_Meta
@@ -46,6 +51,12 @@ class Custom_Event_Meta {
 				)
 			);
 		});
+
+		self::$supported_module_type = array(
+			'featured_artist' => array('title' =>'Featured Artist', 'method' => 'fa_module'),
+			'videos' => array('title' =>'Videos', 'method' => 'video_module'),
+			'news' => array('title' =>'News', 'method' => 'news_module')
+		);
 	}
 
 
@@ -68,99 +79,169 @@ class Custom_Event_Meta {
 	}
 
 	/**
+	 * Method to render Featured Artists Module
+	 * @param array $data - stored values for the module
+	 * @param int $index - numeric index of the module
+	 * @return string $result - HTML for the module
+	 */
+	public function fa_module($index, $data) {
+		$result = '';
+		$default_element_num = 3;
+		if (empty($data)) return $result;
+
+		ob_start();
+		?>
+		<table class="poc-meta-table">
+			<tbody>
+				<tr>
+					<td colspan="2">
+						<?php
+							$key = 'module_title';
+							$name = self::SET_KEY . '[' . $key . ']';
+							$value = (!empty($data[$key])) ? $data[$key] : '';
+						?>
+						<input type="text" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($value); ?>" class="poc-input-full-field" placeholder="Module Title">
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2">
+						<?php
+							$key = 'more_link';
+							$name = self::SET_KEY . '[' . $key . ']';
+							$value = (!empty($data[$key])) ? $data[$key] : '';
+						?>
+						<input type="text" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($value); ?>" class="poc-input-full-field" placeholder="More Link">
+					</td>
+				</tr>
+				<?php 
+					$images_count = count($data['element_image']);
+					$title_count = count($data['element_title']);
+					$link_count = count($data['element_link']);
+					$element_count = max($default_element_num, $title_count, $link_count, $images_count);
+				?>
+				<?php for ($i = 0; $i < $element_count; $i++) : ?>
+					<tr>
+						<td class="label-td">
+							<label for="">Image <?php echo $i + 1;?></label>
+						</td>
+						<td>
+							<?php
+								$image_src = '';
+								$image_id = '';
+								$key = 'element_image';
+								$name = self::SET_KEY . '[' . $key . '][' . $i .']';
+								$value = (!empty($data[$key][$i])) ? $data[$key][$i] : '';
+								if (!empty($value)) {
+									$image_atts = wp_get_attachment_image_src($value, 'thumbnail');
+									if (!empty($image_atts) && !empty($image_atts[0])) {
+										$image_src = $image_atts[0];
+										$image_id = $value;
+									}
+								}
+							?>
+							<div class="meta-image-selector">
+								<?php if (!empty($image_src)) : ?>
+									<img src="<?php echo esc_url($image_src); ?>" class="meta-image-preview" />
+								<?php endif; ?>
+
+								<input type="hidden" class="meta-image-id" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($image_id); ?>" data-preview-image-size="<?php echo esc_attr('thumbnail'); ?>" />
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td class="label-td">
+							<label for="">Title <?php echo $i+1;?></label>
+						</td>
+						<td>
+							<?php
+								$key = 'element_title';
+								$name = self::SET_KEY . '[' . $key . '][' . $i .']';
+								$value = (!empty($data[$key][$i])) ? $data[$key][$i] : '';
+							?>
+							<input type="text" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($value); ?>" class="poc-input-full-field" placeholder="Element Title">
+						</td>
+					</tr>
+					<tr>
+						<td class="label-td">
+							<label for="">Link <?php echo $i+1;?></label>
+						</td>
+						<td>
+							<?php
+								$key = 'element_link';
+								$name = self::SET_KEY . '[' . $key . '][' . $i .']';
+								$value = (!empty($data[$key][$i])) ? $data[$key][$i] : '';
+							?>
+							<input type="text" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($value); ?>" class="poc-input-full-field" placeholder="Element Link">
+						</td>
+					</tr>
+				<?php endfor; ?>
+			</tbody>
+		</table>
+		<?php
+		$result = ob_get_contents();
+		ob_end_clean();
+
+		return $result;
+	}
+
+	/**
 	 * Draws meta box on the page
 	 * @param object $post - object type WP_Post
 	 */
 	public function metabox($post) { 
-		$meta = self::get_meta($post->ID); ?>
+		$meta = self::get_meta($post->ID);var_dump($meta);
+		/*
+			Meta structure:
+			[modules]
+				[types] ($supported_module_type values)
+					[module] (1,2,3 indexes)
+						[module data] (custom form data)
+		*/
+		$meta = array('modules' => array(
+			'featured_artist' => array(
+				0 => array(
+					'module_title' => 'Features Artists',
+					'more_link' => 'http://google.com',
+					'element_image' => array("7","5","6"),
+					'element_title' => array('Bob','Paul','Chris','Garry','Pete'),
+					'element_link' => array('http://google.com','http://google.com','http://google.com')
+				),
+				1 => array(
+					'module_title' => 'Features Artists',
+					'more_link' => 'http://google.com',
+					'element_image' => array("7","5","6"),
+					'element_title' => array('Bob','Paul','Chris'),
+					'element_link' => array('http://google.com','http://google.com','http://google.com')
+				)
+			)
+		));
 
-		<fieldset class="poc-fieldset-block">
-			<legend>Module Management:</legend>
+		
+		$modules = $meta['modules'];
+//var_dump($modules);
+		?>
 
-			<table class="poc-meta-table">
-				<tbody>
-					<tr>
-						<td colspan="2">
-							<?php
-								$key = 'module_title';
-								$name = self::SET_KEY . '[' . $key . ']';
-								$value = (!empty($meta[$key])) ? $meta[$key] : '';
-							?>
-							<input type="text" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($value); ?>" class="poc-input-full-field" placeholder="Module Title">
-						</td>
-					</tr>
-					<tr>
-						<td colspan="2">
-							<?php
-								$key = 'more_link';
-								$name = self::SET_KEY . '[' . $key . ']';
-								$value = (!empty($meta[$key])) ? $meta[$key] : '';
-							?>
-							<input type="text" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($value); ?>" class="poc-input-full-field" placeholder="More Link">
-						</td>
-					</tr>
-					<?php for ($i=0; $i<3; $i++):?>
-						<tr>
-							<td class="label-td">
-								<label for="">Image <?php echo $i+1;?></label>
-							</td>
-							<td>
-								<?php
-									$image_src = '';
-									$image_id = '';
-									$key = 'element_image';
-									$name = self::SET_KEY . '[' . $key . '][' . $i .']';
-									$value = (!empty($meta[$key][$i])) ? $meta[$key][$i] : '';
-									if (!empty($value)) {
-										$image_atts = wp_get_attachment_image_src($value, 'thumbnail');
-										if (!empty($image_atts) && !empty($image_atts[0])) {
-											$image_src = $image_atts[0];
-											$image_id = $value;
-										}
-									}
-								?>
-								<div class="meta-image-selector">
-									<?php if (!empty($image_src)) : ?>
-										<img src="<?php echo esc_url($image_src); ?>" class="meta-image-preview" />
-									<?php endif; ?>
-
-									<input type="hidden" class="meta-image-id" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($image_id); ?>" data-preview-image-size="<?php echo esc_attr('thumbnail'); ?>" />
-								</div>
-							</td>
-						</tr>
-					<?php endfor; ?>
-
-					<?php for ($i=0; $i<3; $i++):?>
-						<tr>
-							<td class="label-td">
-								<label for="">Title <?php echo $i+1;?></label>
-							</td>
-							<td>
-								<?php
-									$key = 'element_title';
-									$name = self::SET_KEY . '[' . $key . '][' . $i .']';
-									$value = (!empty($meta[$key][$i])) ? $meta[$key][$i] : '';
-								?>
-								<input type="text" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($value); ?>" class="poc-input-full-field" placeholder="Element Title">
-							</td>
-						</tr>
-						<tr>
-							<td class="label-td">
-								<label for="">Link <?php echo $i+1;?></label>
-							</td>
-							<td>
-								<?php
-									$key = 'element_link';
-									$name = self::SET_KEY . '[' . $key . '][' . $i .']';
-									$value = (!empty($meta[$key][$i])) ? $meta[$key][$i] : '';
-								?>
-								<input type="text" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($value); ?>" class="poc-input-full-field" placeholder="Element Link">
-							</td>
-						</tr>
-					<?php endfor; ?>
-				</tbody>
-			</table>
-		</fieldset>
+		<div class="clone-button">
+			<select>
+				<?php foreach (self::$supported_module_type as $value => $config): ?>
+					<option value="<?php echo esc_attr($value); ?>"><?php echo esc_html($config['title']); ?></option>
+				<?php endforeach; ?>
+			</select>
+			<a href="#" class="page-title-action" data-clone-callback="dcm_update_index" data-clone-target="#smart-banner-widget-table .fieldset-block-dummy.banner-widget-link-dummy">Add Module</a>
+		</div>
+		<?php foreach ($modules as $module_type => $module_data): //var_dump($module_type, '<br><br>',self::$supported_module_type);?>
+			<?php if (!array_key_exists($module_type, self::$supported_module_type)) continue; ?>
+			<?php foreach ($module_data as $module_index => $data): var_dump($module_data); ?>
+				<fieldset class="poc-fieldset-block">
+					<legend><?php echo esc_html(self::$supported_module_type[$module_type]['title']); ?> Module:</legend>
+					<?php
+						$method = self::$supported_module_type[$module_type]['method'];
+						echo self::$method($module_index, $data);
+					?>
+					
+				</fieldset>
+			<?php endforeach; //end of module loop ?>
+		<?php endforeach; // end of module type loop ?>
 		<?php
 		wp_nonce_field(self::NONCE_VALUE, self::NONCE_NAME);
 	}
@@ -200,7 +281,7 @@ class Custom_Event_Meta {
 
 		$data = $_REQUEST[self::SET_KEY];
 		$sanitized_data = array();
-
+var_dump($data);die;
 		if (!empty($data)) {
 
 			// Title

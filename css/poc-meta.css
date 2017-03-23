@@ -1,3 +1,31 @@
+/* Clone Buttons */
+.clone-button {
+	margin: 10px;
+	overflow: hidden;
+}
+.clone-button a.page-title-action {
+	cursor: pointer;
+	float: right;
+	margin: 0 5px;
+	top: 0;
+}
+.remove-button {
+	color: #a00 !important;
+	display: none;
+	font-size: 0.8em;
+	margin: 1px 0 0 0;
+	position: absolute;
+	right: 0;
+	top: 0;
+}
+.fieldset-just-added .block-name-handle {
+	color: #0093d0;
+}
+.fieldset-just-added .block-name-handle span {
+	font-weight: bold;
+}
+
+
 .poc-fieldset-block {
 	border: 1px solid #dfdfdf;
 	margin-bottom: 10px;
