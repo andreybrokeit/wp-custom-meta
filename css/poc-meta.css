@@ -1,15 +1,15 @@
 /* Clone Buttons */
-.clone-button {
+.dcm-clone-button, .dcm-clone-menu {
 	margin: 10px;
 	overflow: hidden;
 }
-.clone-button a.page-title-action {
+.dcm-clone-menu a.page-title-action {
 	cursor: pointer;
 	float: right;
-	margin: 0 5px;
+	margin: 0 10px;
 	top: 0;
 }
-.remove-button {
+.dcm-remove-button {
 	color: #a00 !important;
 	display: none;
 	font-size: 0.8em;
@@ -33,6 +33,11 @@
 	padding: 10px;
 	position: relative;
 }
+.poc-fieldset-block-dummy {
+	display: none;
+	background-color: green;
+}
+
 .poc-input-full-field {
 	width: 99%;
 }
@@ -88,4 +93,27 @@
 .meta-image-selector .meta-image-delete-button:before {
 	content: "\f014";
 	color: red;
+}
+
+/* Sortable Blocks */
+.poc-sortable-blocks {
+	list-style-type: none; 
+	margin: 0; 
+	padding: 0;
+}
+.poc-sortable-blocks li {
+	background: none;
+	border: none;
+	margin: 0;
+	padding: 0;
+}
+.poc-draggable-placeholder {
+	background-color: none !important;
+	border: 1px dashed grey !important;
+	display: block;
+	height: 50px;
+	width: 100%;
+}
+.poc-fieldset-block.collapsible {
+	position: relative;
 }
