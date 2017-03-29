@@ -79,15 +79,16 @@ class Custom_Event_Meta {
 	}
 
 	/**
-	 * Method to render Featured Artists Module
+	 * Method to render News Module
 	 * @param array $data - stored values for the module
 	 * @param int $index - numeric index of the module
 	 * @return string $result - HTML for the module
 	 */
-	public function fa_module($index, $data) {
+	public function news_module($index, $data) {
 		$result = '';
 		$default_element_num = 3;
-		if (empty($data)) return $result;
+		$module_type = 'news';
+		if (empty($data) && $index !== 'dummy') return $result;
 
 		ob_start();
 		?>
@@ -97,17 +98,28 @@ class Custom_Event_Meta {
 					<td colspan="2">
 						<?php
 							$key = 'module_title';
-							$name = self::SET_KEY . '[' . $key . ']';
+							$name = self::SET_KEY . '[' . esc_attr($index ) . ']' . '[' . $key . ']';
 							$value = (!empty($data[$key])) ? $data[$key] : '';
 						?>
 						<input type="text" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($value); ?>" class="poc-input-full-field" placeholder="Module Title">
+						<?php
+							$key = 'module_type';
+							$name = self::SET_KEY . '[' . esc_attr($index ) . ']' . '[' . $key . ']';
+							$value = $module_type;
+						?>
+						<input type="hidden" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($value); ?>" class="poc-input-full-field">
+						<?php
+							$key = 'order';
+							$name = self::SET_KEY . '[' . esc_attr($index ) . ']' . '[' . $key . ']';
+						?>
+						<input type="hidden" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($index); ?>" class="item-index" />
 					</td>
 				</tr>
 				<tr>
 					<td colspan="2">
 						<?php
 							$key = 'more_link';
-							$name = self::SET_KEY . '[' . $key . ']';
+							$name = self::SET_KEY . '[' . esc_attr($index ) . ']' . '[' . $key . ']';
 							$value = (!empty($data[$key])) ? $data[$key] : '';
 						?>
 						<input type="text" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($value); ?>" class="poc-input-full-field" placeholder="More Link">
@@ -129,7 +141,7 @@ class Custom_Event_Meta {
 								$image_src = '';
 								$image_id = '';
 								$key = 'element_image';
-								$name = self::SET_KEY . '[' . $key . '][' . $i .']';
+								$name = self::SET_KEY . '[' . esc_attr($index ) . ']' . '[' . $key . '][' . $i .']';
 								$value = (!empty($data[$key][$i])) ? $data[$key][$i] : '';
 								if (!empty($value)) {
 									$image_atts = wp_get_attachment_image_src($value, 'thumbnail');
@@ -155,7 +167,7 @@ class Custom_Event_Meta {
 						<td>
 							<?php
 								$key = 'element_title';
-								$name = self::SET_KEY . '[' . $key . '][' . $i .']';
+								$name = self::SET_KEY . '[' . esc_attr($index ) . ']' . '[' . $key . '][' . $i .']';
 								$value = (!empty($data[$key][$i])) ? $data[$key][$i] : '';
 							?>
 							<input type="text" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($value); ?>" class="poc-input-full-field" placeholder="Element Title">
@@ -168,7 +180,242 @@ class Custom_Event_Meta {
 						<td>
 							<?php
 								$key = 'element_link';
-								$name = self::SET_KEY . '[' . $key . '][' . $i .']';
+								$name = self::SET_KEY . '[' . esc_attr($index ) . ']' . '[' . $key . '][' . $i .']';
+								$value = (!empty($data[$key][$i])) ? $data[$key][$i] : '';
+							?>
+							<input type="text" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($value); ?>" class="poc-input-full-field" placeholder="Element Link">
+						</td>
+					</tr>
+				<?php endfor; ?>
+			</tbody>
+		</table>
+		<?php
+		$result = ob_get_contents();
+		ob_end_clean();
+
+		return $result;
+	}
+
+	/**
+	 * Method to render Videos Module
+	 * @param array $data - stored values for the module
+	 * @param int $index - numeric index of the module
+	 * @return string $result - HTML for the module
+	 */
+	public function video_module($index, $data) {
+		$result = '';
+		$default_element_num = 3;
+		$module_type = 'videos';
+		if (empty($data) && $index !== 'dummy') return $result;
+
+		ob_start();
+		?>
+		<table class="poc-meta-table">
+			<tbody>
+				<tr>
+					<td colspan="2">
+						<?php
+							$key = 'module_title';
+							$name = self::SET_KEY . '[' . esc_attr($index ) . ']' . '[' . $key . ']';
+							$value = (!empty($data[$key])) ? $data[$key] : '';
+						?>
+						<input type="text" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($value); ?>" class="poc-input-full-field" placeholder="Module Title">
+						<?php
+							$key = 'module_type';
+							$name = self::SET_KEY . '[' . esc_attr($index ) . ']' . '[' . $key . ']';
+							$value = $module_type;
+						?>
+						<input type="hidden" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($value); ?>" class="poc-input-full-field">
+						<?php
+							$key = 'order';
+							$name = self::SET_KEY . '[' . esc_attr($index ) . ']' . '[' . $key . ']';
+						?>
+						<input type="hidden" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($index); ?>" class="item-index" />
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2">
+						<?php
+							$key = 'more_link';
+							$name = self::SET_KEY . '[' . esc_attr($index ) . ']' . '[' . $key . ']';
+							$value = (!empty($data[$key])) ? $data[$key] : '';
+						?>
+						<input type="text" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($value); ?>" class="poc-input-full-field" placeholder="More Link">
+					</td>
+				</tr>
+				<?php 
+					$images_count = count($data['element_image']);
+					$title_count = count($data['element_title']);
+					$link_count = count($data['element_link']);
+					$element_count = max($default_element_num, $title_count, $link_count, $images_count);
+				?>
+				<?php for ($i = 0; $i < $element_count; $i++) : ?>
+					<tr>
+						<td class="label-td">
+							<label for="">Image <?php echo $i + 1;?></label>
+						</td>
+						<td>
+							<?php
+								$image_src = '';
+								$image_id = '';
+								$key = 'element_image';
+								$name = self::SET_KEY . '[' . esc_attr($index ) . ']' . '[' . $key . '][' . $i .']';
+								$value = (!empty($data[$key][$i])) ? $data[$key][$i] : '';
+								if (!empty($value)) {
+									$image_atts = wp_get_attachment_image_src($value, 'thumbnail');
+									if (!empty($image_atts) && !empty($image_atts[0])) {
+										$image_src = $image_atts[0];
+										$image_id = $value;
+									}
+								}
+							?>
+							<div class="meta-image-selector">
+								<?php if (!empty($image_src)) : ?>
+									<img src="<?php echo esc_url($image_src); ?>" class="meta-image-preview" />
+								<?php endif; ?>
+
+								<input type="hidden" class="meta-image-id" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($image_id); ?>" data-preview-image-size="<?php echo esc_attr('thumbnail'); ?>" />
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td class="label-td">
+							<label for="">Title <?php echo $i+1;?></label>
+						</td>
+						<td>
+							<?php
+								$key = 'element_title';
+								$name = self::SET_KEY . '[' . esc_attr($index ) . ']' . '[' . $key . '][' . $i .']';
+								$value = (!empty($data[$key][$i])) ? $data[$key][$i] : '';
+							?>
+							<input type="text" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($value); ?>" class="poc-input-full-field" placeholder="Element Title">
+						</td>
+					</tr>
+					<tr>
+						<td class="label-td">
+							<label for="">Link <?php echo $i+1;?></label>
+						</td>
+						<td>
+							<?php
+								$key = 'element_link';
+								$name = self::SET_KEY . '[' . esc_attr($index ) . ']' . '[' . $key . '][' . $i .']';
+								$value = (!empty($data[$key][$i])) ? $data[$key][$i] : '';
+							?>
+							<input type="text" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($value); ?>" class="poc-input-full-field" placeholder="Element Link">
+						</td>
+					</tr>
+				<?php endfor; ?>
+			</tbody>
+		</table>
+		<?php
+		$result = ob_get_contents();
+		ob_end_clean();
+
+		return $result;
+	}
+	/**
+	 * Method to render Featured Artists Module
+	 * @param array $data - stored values for the module
+	 * @param int $index - numeric index of the module
+	 * @return string $result - HTML for the module
+	 */
+	public function fa_module($index, $data) {
+		$result = '';
+		$default_element_num = 3;
+		$module_type = 'featured_artist';
+		if (empty($data) && $index !== 'dummy') return $result;
+
+		ob_start();
+		?>
+		<table class="poc-meta-table">
+			<tbody>
+				<tr>
+					<td colspan="2">
+						<?php
+							$key = 'module_title';
+							$name = self::SET_KEY . '[' . esc_attr($index ) . ']' . '[' . $key . ']';
+							$value = (!empty($data[$key])) ? $data[$key] : '';
+						?>
+						<input type="text" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($value); ?>" class="poc-input-full-field" placeholder="Module Title">
+						<?php
+							$key = 'module_type';
+							$name = self::SET_KEY . '[' . esc_attr($index ) . ']' . '[' . $key . ']';
+							$value = $module_type;
+						?>
+						<input type="hidden" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($value); ?>" class="poc-input-full-field">
+						<?php
+							$key = 'order';
+							$name = self::SET_KEY . '[' . esc_attr($index ) . ']' . '[' . $key . ']';
+						?>
+						<input type="hidden" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($index); ?>" class="item-index" />
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2">
+						<?php
+							$key = 'more_link';
+							$name = self::SET_KEY . '[' . esc_attr($index ) . ']' . '[' . $key . ']';
+							$value = (!empty($data[$key])) ? $data[$key] : '';
+						?>
+						<input type="text" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($value); ?>" class="poc-input-full-field" placeholder="More Link">
+					</td>
+				</tr>
+				<?php 
+					$images_count = count($data['element_image']);
+					$title_count = count($data['element_title']);
+					$link_count = count($data['element_link']);
+					$element_count = max($default_element_num, $title_count, $link_count, $images_count);
+				?>
+				<?php for ($i = 0; $i < $element_count; $i++) : ?>
+					<tr>
+						<td class="label-td">
+							<label for="">Image <?php echo $i + 1;?></label>
+						</td>
+						<td>
+							<?php
+								$image_src = '';
+								$image_id = '';
+								$key = 'element_image';
+								$name = self::SET_KEY . '[' . esc_attr($index ) . ']' . '[' . $key . '][' . $i .']';
+								$value = (!empty($data[$key][$i])) ? $data[$key][$i] : '';
+								if (!empty($value)) {
+									$image_atts = wp_get_attachment_image_src($value, 'thumbnail');
+									if (!empty($image_atts) && !empty($image_atts[0])) {
+										$image_src = $image_atts[0];
+										$image_id = $value;
+									}
+								}
+							?>
+							<div class="meta-image-selector">
+								<?php if (!empty($image_src)) : ?>
+									<img src="<?php echo esc_url($image_src); ?>" class="meta-image-preview" />
+								<?php endif; ?>
+
+								<input type="hidden" class="meta-image-id" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($image_id); ?>" data-preview-image-size="<?php echo esc_attr('thumbnail'); ?>" />
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td class="label-td">
+							<label for="">Title <?php echo $i+1;?></label>
+						</td>
+						<td>
+							<?php
+								$key = 'element_title';
+								$name = self::SET_KEY . '[' . esc_attr($index ) . ']' . '[' . $key . '][' . $i .']';
+								$value = (!empty($data[$key][$i])) ? $data[$key][$i] : '';
+							?>
+							<input type="text" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($value); ?>" class="poc-input-full-field" placeholder="Element Title">
+						</td>
+					</tr>
+					<tr>
+						<td class="label-td">
+							<label for="">Link <?php echo $i+1;?></label>
+						</td>
+						<td>
+							<?php
+								$key = 'element_link';
+								$name = self::SET_KEY . '[' . esc_attr($index ) . ']' . '[' . $key . '][' . $i .']';
 								$value = (!empty($data[$key][$i])) ? $data[$key][$i] : '';
 							?>
 							<input type="text" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($value); ?>" class="poc-input-full-field" placeholder="Element Link">
@@ -189,59 +436,97 @@ class Custom_Event_Meta {
 	 * @param object $post - object type WP_Post
 	 */
 	public function metabox($post) { 
-		$meta = self::get_meta($post->ID);var_dump($meta);
-		/*
+		$meta = self::get_meta($post->ID);
+	/*
 			Meta structure:
 			[modules]
 				[types] ($supported_module_type values)
 					[module] (1,2,3 indexes)
 						[module data] (custom form data)
-		*/
+	*/
+	/* Sample Data:
 		$meta = array('modules' => array(
-			'featured_artist' => array(
-				0 => array(
-					'module_title' => 'Features Artists',
-					'more_link' => 'http://google.com',
-					'element_image' => array("7","5","6"),
-					'element_title' => array('Bob','Paul','Chris','Garry','Pete'),
-					'element_link' => array('http://google.com','http://google.com','http://google.com')
-				),
-				1 => array(
-					'module_title' => 'Features Artists',
-					'more_link' => 'http://google.com',
-					'element_image' => array("7","5","6"),
-					'element_title' => array('Bob','Paul','Chris'),
-					'element_link' => array('http://google.com','http://google.com','http://google.com')
-				)
+			0 => array(
+				'module_title' => 'Features Artists',
+				'module_type' => 'featured_artist',
+				'more_link' => 'http://ibm.com',
+				'element_image' => array("7","5","6"),
+				'element_title' => array('Bob','Paul','Chris','Garry','Pete'),
+				'element_link' => array('http://ibm.com','http://ibm.com','http://ibm.com')
+			),
+			1 => array(
+				'module_title' => 'Features Artists',
+				'module_type' => 'featured_artist',
+				'more_link' => 'http://google.com',
+				'element_image' => array("7","5","6"),
+				'element_title' => array('Bob','Paul','Chris'),
+				'element_link' => array('http://google.com','http://google.com','http://google.com')
+			),
+			2 => array(
+				'module_title' => 'Videos',
+				'module_type' => 'videos',
+				'more_link' => 'http://yahoo.com',
+				'element_image' => array("7","5","6","8"),
+				'element_title' => array('Crazy Cats','Stupid Dogs','Silly Crows','Normal Hamsters'),
+				'element_link' => array('http://yahoo.com','http://yahoo.com','http://yahoo.com')
+			),
+			3 => array(
+				'module_title' => 'Videos',
+				'module_type' => 'videos',
+				'more_link' => 'http://yahoo.com',
+				'element_image' => array("7","5","6"),
+				'element_title' => array('Bob','Paul','Chris'),
+				'element_link' => array('http://yahoo.com','http://yahoo.com','http://yahoo.com')
+			),
+			4 => array(
+				'module_title' => 'Latest News',
+				'module_type' => 'news',
+				'more_link' => 'http://msn.com',
+				'element_image' => array('7', '5', '6'),
+				'element_title' => array('Game of Thrones','Lates and Greatest', 'The one that got away'),
+				'element_link' => array('http://msn.com','http://msn.com','http://msn.com')
 			)
 		));
-
-		
-		$modules = $meta['modules'];
-//var_dump($modules);
-		?>
-
-		<div class="clone-button">
+	*/
+		$modules = (!empty($meta['modules'])) ? $meta['modules'] : array(); ?>
+		<div class="dcm-clone-menu">
 			<select>
 				<?php foreach (self::$supported_module_type as $value => $config): ?>
 					<option value="<?php echo esc_attr($value); ?>"><?php echo esc_html($config['title']); ?></option>
 				<?php endforeach; ?>
 			</select>
-			<a href="#" class="page-title-action" data-clone-callback="dcm_update_index" data-clone-target="#smart-banner-widget-table .fieldset-block-dummy.banner-widget-link-dummy">Add Module</a>
+			<a href="#" class="dcm-clone-button page-title-action" data-clone-callback="dynamic_content_manager.update_local_index" data-clone-target="dummy">Add Module</a>
 		</div>
-		<?php foreach ($modules as $module_type => $module_data): //var_dump($module_type, '<br><br>',self::$supported_module_type);?>
+		<ul id="poc-module-wrapper" class="poc-sortable-blocks ui-sortable">
+		<?php foreach ($modules as $order => $data): ?>
+			<?php $module_type = $data['module_type']; ?>
 			<?php if (!array_key_exists($module_type, self::$supported_module_type)) continue; ?>
-			<?php foreach ($module_data as $module_index => $data): var_dump($module_data); ?>
-				<fieldset class="poc-fieldset-block">
-					<legend><?php echo esc_html(self::$supported_module_type[$module_type]['title']); ?> Module:</legend>
+			<li class="ui-state-default">
+				<fieldset class="poc-fieldset-block collapsible">
+					<legend class="sortable-block"><?php echo esc_html(self::$supported_module_type[$module_type]['title']); ?> Module:</legend>
+					<a href="#" class="dcm-remove-button">Remove</a>
+					<div class="content-item-wrapper">
 					<?php
 						$method = self::$supported_module_type[$module_type]['method'];
-						echo self::$method($module_index, $data);
+						echo self::$method($order, $data);
 					?>
-					
+					</div>
 				</fieldset>
-			<?php endforeach; //end of module loop ?>
-		<?php endforeach; // end of module type loop ?>
+			</li>
+		<?php endforeach; // end of module loop ?>
+		</ul>
+		<?php foreach (self::$supported_module_type as $type => $value) : ?>
+			<fieldset class="poc-fieldset-block-dummy collapsible <?php echo 'dummy-' . esc_attr($type); ?>">
+				<legend class="sortable-block"><?php echo esc_html(self::$supported_module_type[$type]['title']); ?> Module:</legend>
+				<a href="#" class="dcm-remove-button">Remove</a>
+				<div class="content-item-wrapper">
+				<?php
+					$method = self::$supported_module_type[$type]['method'];
+					echo self::$method('dummy', array());
+				?>
+				</div>
+			</fieldset>
+		<?php endforeach; // end of inject dummy templates loop ?>
 		<?php
 		wp_nonce_field(self::NONCE_VALUE, self::NONCE_NAME);
 	}
@@ -280,41 +565,54 @@ class Custom_Event_Meta {
 			!wp_verify_nonce($_REQUEST[self::NONCE_NAME], self::NONCE_VALUE)) return $post_id;
 
 		$data = $_REQUEST[self::SET_KEY];
+
 		$sanitized_data = array();
-var_dump($data);die;
+
 		if (!empty($data)) {
+			foreach ($data as $index => $module) {
+				if (!is_int($index)) continue;
 
-			// Title
-			if (!empty($data['module_title'])) {
-				$sanitized_data['module_title'] = sanitize_text_field($data['module_title']);
-			}
-		
-			// Link
-			if (!empty($data['more_link'])) {
-				$sanitized_data['more_link'] = sanitize_text_field($data['more_link']);
-			}
+				// Order
+				if (isset($module['order'])) {
+					$order = sanitize_text_field((int)$module['order']);
+				}
 
-			// Elements Images
-			if (!empty($data['element_image'])) {
-				$sanitized_data['element_image'] = array_map('sanitize_text_field', $data['element_image']);
-			}
+				// Type
+				if (!empty($module['module_type'])) {
+					$sanitized_data[$order]['module_type'] = sanitize_text_field($module['module_type']);
+				}
 
-			// Elements Titles
-			if (!empty($data['element_title'])) {
-				$sanitized_data['element_title'] = array_map('sanitize_text_field', $data['element_title']);
-			}
+				// Title
+				if (!empty($module['module_title'])) {
+					$sanitized_data[$order]['module_title'] = sanitize_text_field($module['module_title']);
+				}
+			
+				// Link
+				if (!empty($module['more_link'])) {
+					$sanitized_data[$order]['more_link'] = sanitize_text_field($module['more_link']);
+				}
 
-			// Elements Links
-			if (!empty($data['element_link'])) {
-				$sanitized_data['element_link'] = array_map('sanitize_text_field', $data['element_link']);
-			}
+				// Elements Images
+				if (!empty($module['element_image'])) {
+					$sanitized_data[$order]['element_image'] = array_map('sanitize_text_field', $module['element_image']);
+				}
 
+				// Elements Titles
+				if (!empty($module['element_title'])) {
+					$sanitized_data[$order]['element_title'] = array_map('sanitize_text_field', $module['element_title']);
+				}
+
+				// Elements Links
+				if (!empty($module['element_link'])) {
+					$sanitized_data[$order]['element_link'] = array_map('sanitize_text_field', $module['element_link']);
+				}
+			} // end of foreach module
 		} // if not empty Rad Data
 
 		if (empty($sanitized_data)) {
 			delete_post_meta($post_id, self::META_KEY);
 		} else {
-			update_post_meta($post_id, self::META_KEY, $sanitized_data);
+			update_post_meta($post_id, self::META_KEY, array('modules' => $sanitized_data));
 		}
 
 		return $post_id;
