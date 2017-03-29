@@ -20,7 +20,7 @@
 jQuery(function($) {
 	dynamic_content_manager = {};
 
-	(function() {
+	dynamic_content_manager.update_local_index = function() {
 		var count = ($('.fieldset-block:not(.fieldset-block-dummy)').length)*1;
 		var index = $('.fieldset-block-dummy').first().data('clone-siblings')*1;
 
@@ -30,83 +30,49 @@ jQuery(function($) {
 			index = count + 1;
 		}
 		$('.fieldset-block-dummy').data('clone-siblings', index);
-	})();
+	}
 
 	dynamic_content_manager.clone_dummy_form_element = function($dummy_obj) {
 		if (!$dummy_obj) return;
+		var $container = $('#poc-module-wrapper');
 
-		var $container = $dummy_obj.parent();
-		var new_index = $dummy_obj.data('clone-siblings')*1 + 1;
-		$dummy_obj.data('clone-siblings', new_index);
+		var new_index = $('#poc-module-wrapper li').size();
 
 		var $new_obj = $dummy_obj.clone();
-		$new_obj
-			.removeClass('cbs-fieldset-block-dummy')
-			.addClass('cbs-fieldset-just-added')
-			.addClass('modular-content-block')
-			.html(function(i, oldHTML) { // replace indexes
-				return oldHTML.replace(/_DUMMY_INDEX_/g, new_index);
-			})
-			.html(function(i, oldHTML) { // replace names
-				return oldHTML.replace(/_DUMMY_NAME_/g, new_index);
-			})
-			.insertBefore($container.children('.cbs-fieldset-block-dummy'));
 
-		// setup collapsible item
-		if ($new_obj.children('fieldset').children('legend').length > 0) {
-			cbs_admin.setup_collapsible_block($new_obj.children('fieldset').children('legend'));
-		}
+		$container.append(
+			$('<li>').addClass('ui-state-default')
+			.append($new_obj
+				.attr('class', '')
+				.addClass('poc-fieldset-block')
+				.addClass('collapsible')
+				.html(function(i, oldHTML) { // replace indexes
+					return oldHTML.replace(/dummy/g, new_index);
+				})
+			)
+		);
+
+		dynamic_content_manager.setup_collapsible_block($new_obj.find('legend'));
 
 		// initiate removable button
-		if ($new_obj.find('.cbs-removing-button').length > 0) {
-			cbs_admin.update_remove_buttons($new_obj);
-		}
-
-		// setup showhide
-		var $new_showhide_selects = $new_obj.find(".cbs-theme-form-select select.showhide-row");
-		if ($new_showhide_selects.length > 0) {
-			$new_showhide_selects.each(function(){
-				cbs_admin.setup_select_showhide($(this));
-				cbs_admin.update_select_showhide($(this));
-			});
-		}
-
-		// Setup Checkbox
-		var $new_showhide_checkbox = $new_obj.find(".cbs-theme-form-checkbox input[type='checkbox'].showhide-row");
-		if ($new_showhide_checkbox.length > 0) {
-			$new_showhide_checkbox.each(function(){
-				cbs_admin.setup_checkbox_showhide($(this));
-				cbs_admin.update_checkbox_showhide($(this));
-			});
-		}
-
-		// Setup Select Multiple items with Select2
-		var $new_select2_box = $new_obj.find("select[multiple='multiple'].cbs-select2");
-		if ($new_select2_box.length > 0) {
-			$new_select2_box.each(function(){
-				$(this)
-					.addClass('cbs-category-dropdown')
-					.select2({
-						placeholder: 'Select Category',
-						allowClear: true
-					});
-			});
+		if ($new_obj.find('.dcm-remove-button').length > 0) {
+			dynamic_content_manager.update_remove_buttons($new_obj);
 		}
 
 		// Setup MediaImage blocks
 		var $new_media_image_box = $new_obj.find(".meta-image-selector");
 		if ($new_media_image_box.length > 0) {
 			$new_media_image_box.each(function(){
-				cbs_admin.setup_meta_image($(this));
+				dynamic_content_manager.setup_meta_image($(this));
 			});
 		}
 
 	}
 	dynamic_content_manager.update_remove_buttons = function($block) {
 		if ($block) {
-			var $remove_buttons = $block.find('.cbs-removing-button');
+			var $remove_buttons = $block.find('.dcm-remove-button');
 		} else {
-			var $remove_buttons = $('.modular-content-block .cbs-removing-button');
+			var $remove_buttons = $('.dcm-remove-button');
 		}
 
 		if ($remove_buttons.length > 0) {
@@ -115,7 +81,7 @@ jQuery(function($) {
 					.off('click')
 					.on('click', function(e){
 						e.preventDefault();
-						$(this).closest('.modular-content-block').remove();
+						$(this).closest('li').remove();
 						$(this).off('click');
 						dynamic_content_manager.update_sortable_index();
 					})
@@ -124,12 +90,32 @@ jQuery(function($) {
 		}
 	}
 
+	dynamic_content_manager.init_clone_buttons = function() {
 
+		// clone form items links
+		var $clone_buttons = $('.dcm-clone-button');
+		if ($clone_buttons.length > 0) {
+			$clone_buttons.each(function(){
+				$(this).on('click', function(e){
+					e.preventDefault();
 
+					// get type to clone
+					$clone_type = $(this).parent().children('select').find(":selected").val();
+					var clone_dummy_selector = $(this).data('clone-target');
+					clone_dummy_selector = clone_dummy_selector + '-' + $clone_type;
 
-	var image_selector = {};
+					if (clone_dummy_selector) {
+						var $clone_object = $('.'+clone_dummy_selector);
+						dynamic_content_manager.clone_dummy_form_element($clone_object);
+						dynamic_content_manager.update_sortable_index();
+					}
+				});
+			});
+			dynamic_content_manager.update_remove_buttons();
+		}
+	}
 
-	image_selector.setup_meta_image = function($obj) {
+	dynamic_content_manager.setup_meta_image = function($obj) {
 
 		// for sanity, always has class of "meta-image-selector"
 		if (!$obj.hasClass('meta-image-selector')) return;
@@ -234,7 +220,71 @@ jQuery(function($) {
 	var $meta_images = $('.meta-image-selector');
 	if ($meta_images.length > 0) {
 		$meta_images.each(function(){
-			image_selector.setup_meta_image($(this));
+			dynamic_content_manager.setup_meta_image($(this));
 		});
 	}
+
+
+	dynamic_content_manager.setup_dummy_removal_on_submit = function() {
+		$('form').on('submit', function(e){
+			e.preventDefault();
+			$('form .poc-fieldset-block-dummy').remove();
+			$('form')
+				.off('submit')
+				.submit();
+		});
+	};
+
+	dynamic_content_manager.update_sortable_index = function($block) {
+
+		if (typeof $block == 'undefined') {
+			$block = $('.poc-sortable-blocks');
+		}
+		if ($block.length < 1) return;
+
+		var count = 0;
+		$block.find('.item-index').each(function(){
+			$(this).attr('value', count);
+			count++;
+		});
+	}
+
+	dynamic_content_manager.setup_collapsible_block = function($obj) {
+		if (!$obj) return;
+
+		// bind for collapsible clicks
+		$obj.bind('click', function(e){
+			var $collapsible_content = $(this).parent().children('.content-item-wrapper');
+
+			$collapsible_content.slideToggle('fast');
+			$(this).parent().toggleClass('state-off');
+		});
+	};
+
+	// *********************************************************** //
+	// Init things: set up buttons, remove dummy clones, etc
+	dynamic_content_manager.init_clone_buttons();
+	dynamic_content_manager.setup_dummy_removal_on_submit();
+
+	var $sortable_blocks = $('.poc-sortable-blocks');console.log($sortable_blocks);
+	if ($sortable_blocks.length > 0) {
+		$sortable_blocks.sortable({
+			axis: 'y',
+			handle: '.sortable-block',
+			placeholder: 'poc-draggable-placeholder',
+			update: function (event, ui) {
+				dynamic_content_manager.update_sortable_index();
+			}
+		});
+	}
+
+	// collapsible clicks for fieldset
+	var $collapsible_fieldset = $('fieldset.collapsible legend');
+	if ($collapsible_fieldset.length > 0) {
+		$collapsible_fieldset.each(function(){
+			dynamic_content_manager.setup_collapsible_block($(this));
+		});
+	}// only for fieldset block present
+
+	// *********************************************************** //
 });
