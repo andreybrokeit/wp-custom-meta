@@ -114,6 +114,26 @@
 	height: 50px;
 	width: 100%;
 }
+/* Sortable Image Blocks */
+.poc-sortable-image-blocks {
+	list-style-type: none; 
+	margin: 0; 
+	padding: 0;
+}
+tr.sortable-image {
+	background: none;
+	border: 4px solid grey;
+	display: block;
+	margin: 5px;
+	padding: 0;
+}
+tr.poc-draggable-placeholder {
+	background-color: none !important;
+	border: 1px dashed grey !important;
+	display: block;
+	height: 50px;
+	width: 100%;
+}
 .poc-fieldset-block.collapsible {
 	position: relative;
 }

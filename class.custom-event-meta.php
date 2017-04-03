@@ -53,6 +53,7 @@ class Custom_Event_Meta {
 		});
 
 		self::$supported_module_type = array(
+			'collage' => array('title' =>'Collage', 'method' => 'collage'),
 			'featured_artist' => array('title' =>'Featured Artist', 'method' => 'fa_module'),
 			'videos' => array('title' =>'Videos', 'method' => 'video_module'),
 			'news' => array('title' =>'News', 'method' => 'news_module')
@@ -432,6 +433,118 @@ class Custom_Event_Meta {
 	}
 
 	/**
+	 * Method to render Collage Module
+	 * @param array $data - stored values for the module
+	 * @param int $index - numeric index of the module
+	 * @return string $result - HTML for the module
+	 */
+	public function collage($index, $data) {
+		$result = '';
+		$default_element_num = 5;
+		$module_type = 'collage';
+		if (empty($data) && $index !== 'dummy') return $result;
+
+		ob_start();
+		?>
+		<table class="poc-meta-table">
+			<tbody class="poc-sortable-image-blocks ui-sortable">
+				<?php
+					$key = 'order';
+					$name = self::SET_KEY . '[' . esc_attr($index ) . ']' . '[' . $key . ']';
+				?>
+				<input type="hidden" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($index); ?>" class="item-index" />
+				<?php
+					$key = 'module_type';
+					$name = self::SET_KEY . '[' . esc_attr($index ) . ']' . '[' . $key . ']';
+					$value = $module_type;
+				?>
+				<input type="hidden" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($value); ?>" class="poc-input-full-field">
+				<?php 
+					$images_count = count($data['element_image']);
+					$title_count = count($data['element_title']);
+					$link_count = count($data['element_link']);
+					$element_count = max($default_element_num, $title_count, $link_count, $images_count);
+				?>
+				<?php for ($i = 0; $i < $element_count; $i++) : ?>
+					
+					<tr class="sortable-image">
+					<td colspan="2">
+						<table>
+							<tbody>
+								<tr>
+									<td class="label-td">
+										<label for="">Image <?php echo $i + 1;?></label>
+									</td>
+									<td>
+										<?php
+											$key = 'image_order';
+											$name = self::SET_KEY . '[' . esc_attr($index ) . ']' . '[' . $key . '][' . $i .']';
+										?>
+										<input type="text" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($i); ?>" class="item-image-index" />
+										<?php
+											$image_src = '';
+											$image_id = '';
+											$key = 'element_image';
+											$name = self::SET_KEY . '[' . esc_attr($index ) . ']' . '[' . $key . '][' . $i .']';
+											$value = (!empty($data[$key][$i])) ? $data[$key][$i] : '';
+											if (!empty($value)) {
+												$image_atts = wp_get_attachment_image_src($value, 'thumbnail');
+												if (!empty($image_atts) && !empty($image_atts[0])) {
+													$image_src = $image_atts[0];
+													$image_id = $value;
+												}
+											}
+										?>
+										<div class="meta-image-selector">
+											<?php if (!empty($image_src)) : ?>
+												<img src="<?php echo esc_url($image_src); ?>" class="meta-image-preview" />
+											<?php endif; ?>
+
+											<input type="hidden" class="meta-image-id" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($image_id); ?>" data-preview-image-size="<?php echo esc_attr('thumbnail'); ?>" />
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td class="label-td">
+										<label for="">Title <?php echo $i+1;?></label>
+									</td>
+									<td>
+										<?php
+											$key = 'element_title';
+											$name = self::SET_KEY . '[' . esc_attr($index ) . ']' . '[' . $key . '][' . $i .']';
+											$value = (!empty($data[$key][$i])) ? $data[$key][$i] : '';
+										?>
+										<input type="text" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($value); ?>" class="poc-input-full-field" placeholder="Element Title">
+									</td>
+								</tr>
+								<tr>
+									<td class="label-td">
+										<label for="">Link <?php echo $i+1;?></label>
+									</td>
+									<td>
+										<?php
+											$key = 'element_link';
+											$name = self::SET_KEY . '[' . esc_attr($index ) . ']' . '[' . $key . '][' . $i .']';
+											$value = (!empty($data[$key][$i])) ? $data[$key][$i] : '';
+										?>
+										<input type="text" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($value); ?>" class="poc-input-full-field" placeholder="Element Link">
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</td>
+					</tr>
+				<?php endfor; ?>
+			</tbody>
+		</table>
+		<?php
+		$result = ob_get_contents();
+		ob_end_clean();
+
+		return $result;
+	}
+
+	/**
 	 * Draws meta box on the page
 	 * @param object $post - object type WP_Post
 	 */
@@ -501,7 +614,7 @@ class Custom_Event_Meta {
 		<?php foreach ($modules as $order => $data): ?>
 			<?php $module_type = $data['module_type']; ?>
 			<?php if (!array_key_exists($module_type, self::$supported_module_type)) continue; ?>
-			<li class="ui-state-default">
+			<li>
 				<fieldset class="poc-fieldset-block collapsible">
 					<legend class="sortable-block"><?php echo esc_html(self::$supported_module_type[$module_type]['title']); ?> Module:</legend>
 					<a href="#" class="dcm-remove-button">Remove</a>
@@ -565,7 +678,6 @@ class Custom_Event_Meta {
 			!wp_verify_nonce($_REQUEST[self::NONCE_NAME], self::NONCE_VALUE)) return $post_id;
 
 		$data = $_REQUEST[self::SET_KEY];
-
 		$sanitized_data = array();
 
 		if (!empty($data)) {
@@ -575,6 +687,11 @@ class Custom_Event_Meta {
 				// Order
 				if (isset($module['order'])) {
 					$order = sanitize_text_field((int)$module['order']);
+				}
+
+				// Image Order (Collage module)
+				if (isset($module['image_order'])) {
+					$image_order = array_map('sanitize_text_field', $module['image_order']);
 				}
 
 				// Type
@@ -594,17 +711,38 @@ class Custom_Event_Meta {
 
 				// Elements Images
 				if (!empty($module['element_image'])) {
-					$sanitized_data[$order]['element_image'] = array_map('sanitize_text_field', $module['element_image']);
+					if (!empty($image_order)) {
+						$temp_sanitized_images = array_map('sanitize_text_field', $module['element_image']);
+						foreach ($image_order as $old_index => $new_index) {
+							$sanitized_data[$order]['element_image'][$new_index] = $temp_sanitized_images[$old_index];
+						}
+					} else {
+						$sanitized_data[$order]['element_image'] = array_map('sanitize_text_field', $module['element_image']);
+					}
 				}
 
 				// Elements Titles
 				if (!empty($module['element_title'])) {
-					$sanitized_data[$order]['element_title'] = array_map('sanitize_text_field', $module['element_title']);
+					if (!empty($image_order)) {
+						$temp_sanitized_element_title = array_map('sanitize_text_field', $module['element_title']);
+						foreach ($image_order as $old_index => $new_index) {
+							$sanitized_data[$order]['element_title'][$new_index] = $temp_sanitized_element_title[$old_index];
+						}
+					} else {
+						$sanitized_data[$order]['element_title'] = array_map('sanitize_text_field', $module['element_title']);
+					}
 				}
 
 				// Elements Links
 				if (!empty($module['element_link'])) {
-					$sanitized_data[$order]['element_link'] = array_map('sanitize_text_field', $module['element_link']);
+					if (!empty($image_order)) {
+						$temp_sanitized_element_link = array_map('sanitize_text_field', $module['element_link']);
+						foreach ($image_order as $old_index => $new_index) {
+							$sanitized_data[$order]['element_link'][$new_index] = $temp_sanitized_element_link[$old_index];
+						}
+					} else {
+						$sanitized_data[$order]['element_link'] = array_map('sanitize_text_field', $module['element_link']);
+					}
 				}
 			} // end of foreach module
 		} // if not empty Rad Data

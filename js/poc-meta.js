@@ -41,7 +41,7 @@ jQuery(function($) {
 		var $new_obj = $dummy_obj.clone();
 
 		$container.append(
-			$('<li>').addClass('ui-state-default')
+			$('<li>')
 			.append($new_obj
 				.attr('class', '')
 				.addClass('poc-fieldset-block')
@@ -53,6 +53,8 @@ jQuery(function($) {
 		);
 
 		dynamic_content_manager.setup_collapsible_block($new_obj.find('legend'));
+		dynamic_content_manager.setup_sortable_images();
+
 
 		// initiate removable button
 		if ($new_obj.find('.dcm-remove-button').length > 0) {
@@ -249,6 +251,17 @@ jQuery(function($) {
 		});
 	}
 
+	dynamic_content_manager.update_sortable_image_indexes = function() {
+		$block = $('.poc-sortable-image-blocks');
+		if ($block.length < 1) return;
+
+		var count = 0;
+		$block.find('.item-image-index').each(function(){
+			$(this).attr('value', count);
+			count++;
+		});
+	}
+
 	dynamic_content_manager.setup_collapsible_block = function($obj) {
 		if (!$obj) return;
 
@@ -261,12 +274,30 @@ jQuery(function($) {
 		});
 	};
 
+	dynamic_content_manager.setup_sortable_images = function($sortable_images) {
+		if (typeof $sortable_images == 'undefined') {
+			$sortable_images = $('.poc-sortable-image-blocks');
+		}
+
+		$('.poc-sortable-image-blocks').sortable({
+			containerSelector: 'table',
+			itemPath: '> tbody',
+			itemSelector: 'tr',
+			placeholder: 'poc-draggable-placeholder',
+			update: function (event, ui) {
+				dynamic_content_manager.update_sortable_image_indexes();
+			}
+		});
+	};
+
 	// *********************************************************** //
 	// Init things: set up buttons, remove dummy clones, etc
 	dynamic_content_manager.init_clone_buttons();
 	dynamic_content_manager.setup_dummy_removal_on_submit();
+	dynamic_content_manager.setup_sortable_images();
+	dynamic_content_manager.update_sortable_image_indexes();
 
-	var $sortable_blocks = $('.poc-sortable-blocks');console.log($sortable_blocks);
+	var $sortable_blocks = $('.poc-sortable-blocks');
 	if ($sortable_blocks.length > 0) {
 		$sortable_blocks.sortable({
 			axis: 'y',
